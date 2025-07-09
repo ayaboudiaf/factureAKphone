@@ -96,8 +96,9 @@
 
   <table>
     <thead>
-      <tr><th>Produit</th><th>Qté</th><th>Total</th></tr>
-    </thead>
+  <tr><th>Produit</th><th>Qté</th><th>Total</th><th>Suppr.</th></tr>
+</thead>
+
     <tbody id="panier"></tbody>
   </table>
 
@@ -124,28 +125,46 @@
     const prix = parseFloat(document.getElementById("prix").value);
 
     if (produit && quantite > 0 && prix >= 0) {
-      produits.push({ nom: produit, quantite, prix });
-      afficherPanier();
-    }
+  produits.push({ nom: produit, quantite, prix });
+  afficherPanier();
+
+  // Vider les champs sauf le client
+  document.getElementById("produit").value = "";
+  document.getElementById("quantite").value = 1;
+  document.getElementById("prix").value = 0;
+}
+
   }
 
-  function afficherPanier() {
-    const panier = document.getElementById("panier");
-    panier.innerHTML = "";
+function afficherPanier() {
+  const panier = document.getElementById("panier");
+  panier.innerHTML = "";
 
-    let sousTotal = 0;
+  let sousTotal = 0;
 
-    produits.forEach(p => {
-      const ligne = document.createElement("tr");
-      ligne.innerHTML = `<td>${p.nom}</td><td>${p.quantite}</td><td>${(p.prix * p.quantite).toFixed(2)} €</td>`;
-      panier.appendChild(ligne);
-      sousTotal += p.prix * p.quantite;
-    });
+  produits.forEach((p, index) => {
+    const ligne = document.createElement("tr");
+    ligne.innerHTML = `
+      <td>${p.nom}</td>
+      <td>${p.quantite}</td>
+      <td>${(p.prix * p.quantite).toFixed(2)} €</td>
+      <td>
+        <button onclick="supprimerProduit(${index})" style="background:none; border:none; cursor:pointer;">🗑️</button>
+      </td>
+    `;
+    panier.appendChild(ligne);
+    sousTotal += p.prix * p.quantite;
+  });
 
-    const totalTTC = sousTotal * 1.2;
-    document.getElementById("sousTotal").innerText = sousTotal.toFixed(2);
-    document.getElementById("total").innerText = totalTTC.toFixed(2);
-  }
+  const totalTTC = sousTotal * 1.2;
+  document.getElementById("sousTotal").innerText = sousTotal.toFixed(2);
+  document.getElementById("total").innerText = totalTTC.toFixed(2);
+}
+function supprimerProduit(index) {
+  produits.splice(index, 1);
+  afficherPanier();
+}
+
 
   function envoyer() {
     const client = document.getElementById("client").value;
