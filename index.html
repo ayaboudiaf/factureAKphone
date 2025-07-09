@@ -164,15 +164,15 @@
     const TVA = totalTTC - sousTotal;
 
     document.getElementById("ticket-preview").innerHTML = `
-      <div style="font-family: monospace; font-size: 14px; border: 1px dashed #000; padding: 10px;">
+      <div style="font-family: monospace; font-size: 16px; border: 1px dashed #000; padding: 10px;">
         <div style="text-align: center; font-weight: bold;">AK PHONE Solution</div>
         <div style="text-align: center;">
-          ------------------------------<br>
+          --------------------------------------<br>
           14 RUE Gambetta<br>
           08200, Sedan – FRANCE<br>
           Tél : 0123456789<br>
           Siret : 98789929100015<br>
-          ------------------------------<br>
+          --------------------------------------<br>
           Client : ${client}<br>
           Date : ${date}
         </div>
@@ -183,9 +183,8 @@
           </thead>
           <tbody>${lignes}</tbody>
         </table>
-        ------------------------------<br>
+        ----------------------------------------<br>
         <div style="text-align:right;">Sous-total : ${sousTotal.toFixed(2)} €</div>
-        <div style="text-align:right;">TVA 20% : ${TVA.toFixed(2)} €</div>
         <div style="text-align:right;">TOTAL TTC : ${totalTTC.toFixed(2)} €</div>
         <div style="text-align:right;">Paiement : ${paiement}</div>
         <br>
