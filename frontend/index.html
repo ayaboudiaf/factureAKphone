@@ -125,7 +125,8 @@
       }
 
       produits.push({ nom, quantite: qte, prix, imei });
-      const ligne = `<tr><td>${nom}</td><td>${qte}</td><td>${(prix * qte).toFixed(2)} €</td></tr>`;
+      const ligne = `<tr><td>${nom}</td><td>${qte}</td><td>${(prix * qte).toFixed(2)} €
+        </td></tr>`;
       document.getElementById("panier").innerHTML += ligne;
 
       majTotaux();
