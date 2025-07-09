@@ -113,108 +113,92 @@
   <div id="ticket-preview" style="margin-top: 20px;"></div>
 
   <script>
-    const produits = [];
+  let produits = [];
 
-    function ajouterProduit() {
-      const nom = document.getElementById('produit').value;
-      const qte = parseInt(document.getElementById('quantite').value);
-      const prix = parseFloat(document.getElementById('prix').value);
+  function ajouterProduit() {
+    const produit = document.getElementById("produit").value;
+    const quantite = parseInt(document.getElementById("quantite").value);
+    const prix = parseFloat(document.getElementById("prix").value);
 
-      if (!nom || qte <= 0 || prix <= 0) {
-        alert("Remplir tous les champs correctement");
-        return;
-      }
+    if (produit && quantite > 0 && prix >= 0) {
+      produits.push({ nom: produit, quantite, prix });
+      afficherPanier();
+    }
+  }
 
-      produits.push({ nom, quantite: qte, prix});
+  function afficherPanier() {
+    const panier = document.getElementById("panier");
+    panier.innerHTML = "";
 
-      const ligne = `<tr><td>${nom}</td><td>${qte}</td><td>${(prix * qte).toFixed(2)} €</td></tr>`;
-      document.getElementById("panier").innerHTML += ligne;
+    let sousTotal = 0;
 
-      majTotaux();
+    produits.forEach(p => {
+      const ligne = document.createElement("tr");
+      ligne.innerHTML = `<td>${p.nom}</td><td>${p.quantite}</td><td>${(p.prix * p.quantite).toFixed(2)} €</td>`;
+      panier.appendChild(ligne);
+      sousTotal += p.prix * p.quantite;
+    });
 
-      document.getElementById('produit').value = "";
-      document.getElementById('quantite').value = 1;
-      document.getElementById('prix').value = 0;
+    const totalTTC = sousTotal * 1.2;
+    document.getElementById("sousTotal").innerText = sousTotal.toFixed(2);
+    document.getElementById("total").innerText = totalTTC.toFixed(2);
+  }
+
+  function envoyer() {
+    const client = document.getElementById("client").value;
+    const paiement = document.getElementById("paiement").value;
+    const date = new Date().toLocaleString();
+
+    if (!client || produits.length === 0) {
+      alert("Veuillez saisir le client et au moins un produit");
+      return;
     }
 
-    function majTotaux() {
-      const sousTotal = produits.reduce((sum, p) => sum + (p.prix * p.quantite), 0);
-     
-      const total = sousTotal;
+    let lignes = "";
+    let sousTotal = 0;
+    produits.forEach(p => {
+      lignes += `<tr><td>${p.nom}</td><td>${p.quantite}</td><td>${(p.prix * p.quantite).toFixed(2)} €</td></tr>`;
+      sousTotal += p.prix * p.quantite;
+    });
+    const totalTTC = sousTotal * 1.2;
+    const TVA = totalTTC - sousTotal;
 
-      document.getElementById("sousTotal").textContent = sousTotal.toFixed(2);
-      document.getElementById("total").textContent = total.toFixed(2);
-    }
-
-    function envoyer() {
-      const client = document.getElementById('client').value;
-      const paiement = document.getElementById('paiement').value;
-
-      if (!client || produits.length === 0) {
-        alert("Veuillez saisir le client et au moins un produit");
-        return;
-      }
-
-      afficherTicket(client, produits, paiement);
-
-      setTimeout(() => {
-        window.print();
-      }, 500);
-    }
-
-   function afficherTicket(client, produits, paiement) {
-  const date = new Date().toLocaleString();
-  const sousTotal = produits.reduce((sum, p) => sum + (p.prix * p.quantite), 0);
-  const tva = sousTotal * 0.2;
-  const total = sousTotal;
-
-  let lignes = '';
-  produits.forEach(p => {
-    lignes += `<tr>
-      <td>${p.nom}</td>
-      <td>${p.quantite}</td>
-      <td>${(p.prix * p.quantite).toFixed(2)} €</td>
-    </tr>`;
-  });
-
-  document.getElementById("ticket-preview").innerHTML = `
-    <div style="border:1px dashed #000; padding:20px; background:#fff; font-family:monospace;">
-      <div style="text-align:center;">
-        <strong style="font-size:16px;">AK PHONE Solution</strong><br>
+    document.getElementById("ticket-preview").innerHTML = `
+      <div style="font-family: monospace; font-size: 14px; border: 1px dashed #000; padding: 10px;">
+        <div style="text-align: center; font-weight: bold;">AK PHONE Solution</div>
+        <div style="text-align: center;">
+          ------------------------------<br>
+          14 RUE Gambetta<br>
+          08200, Sedan – FRANCE<br>
+          Tél : 0123456789<br>
+          Siret : 98789929100015<br>
+          ------------------------------<br>
+          Client : ${client}<br>
+          Date : ${date}
+        </div>
+        <br>
+        <table style="width:100%; font-size: 13px;">
+          <thead>
+            <tr><th style="text-align:left;">Produit</th><th>Qté</th><th>Total</th></tr>
+          </thead>
+          <tbody>${lignes}</tbody>
+        </table>
         ------------------------------<br>
-        14 RUE Gambetta<br>
-        08200, Sedan – FRANCE<br>
-        Tél : 0123456789<br>
-        Siret : 98789929100015<br>
-        ------------------------------<br>
-        <strong>Client :</strong> ${client}<br>
-        <strong>Date :</strong> ${date}
+        <div style="text-align:right;">Sous-total : ${sousTotal.toFixed(2)} €</div>
+        <div style="text-align:right;">TVA 20% : ${TVA.toFixed(2)} €</div>
+        <div style="text-align:right;">TOTAL TTC : ${totalTTC.toFixed(2)} €</div>
+        <div style="text-align:right;">Paiement : ${paiement}</div>
+        <br>
+        <div style="font-size:12px;">
+          ⚠️ Garantie 3 mois – Pas de remboursement. Casse et liquide non couverts.
+        </div>
+        <br>
+        <div style="text-align:center; font-weight:bold;">Merci pour votre visite ! 📱</div>
       </div>
-      <hr>
-      <table style="width:100%; font-size:14px;">
-        <thead>
-          <tr><th>Produit</th><th>Qté</th><th>Total</th></tr>
-        </thead>
-        <tbody>${lignes}</tbody>
-      </table>
-      <hr>
-      <div style="text-align:right;">
-        Sous-total : ${sousTotal.toFixed(2)} €<br>
-        TVA 20% : ${tva.toFixed(2)} €<br>
-        <strong>Total TTC : ${total.toFixed(2)} €</strong><br>
-        Paiement : ${paiement}
-      </div>
-      <hr>
-      <div style="font-size:12px; text-align:center;">
-        ATTENTION : Garantie 3 mois<br>
-        Pas de remboursement. Casse et liquide non couverts.
-      </div>
-      <div style="font-weight:bold; font-size:16px; text-align:center; margin-top:10px;">
-        Merci pour votre visite ! 🧾
-      </div>
-    </div>
-  `;
-}
-  </script>
+    `;
+
+    window.print();
+  }
+</script>
 </body>
 </html>
