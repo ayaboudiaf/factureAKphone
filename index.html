@@ -120,21 +120,21 @@
   let produits = [];
 
   function ajouterProduit() {
-    const produit = document.getElementById("produit").value;
-    const quantite = parseInt(document.getElementById("quantite").value);
-    const prix = parseFloat(document.getElementById("prix").value);
+  const produit = document.getElementById("produit").value.trim();
+  const quantite = parseInt(document.getElementById("quantite").value);
+  const prix = parseFloat(document.getElementById("prix").value);
 
-    if (produit && quantite > 0 && prix >= 0) {
-  produits.push({ nom: produit, quantite, prix });
-  afficherPanier();
+  if (produit && quantite > 0 && prix >= 0) {
+    produits.push({ nom: produit, quantite, prix });
+    afficherPanier();
 
-  // Vider les champs sauf le client
-  document.getElementById("produit").value = "";
-  document.getElementById("quantite").value = 1;
-  document.getElementById("prix").value = 0;
+    // ✅ Vider uniquement les champs article, pas le client
+    document.getElementById("produit").value = "";
+    document.getElementById("quantite").value = 1;
+    document.getElementById("prix").value = 0;
+  }
 }
 
-  }
 
 function afficherPanier() {
   const panier = document.getElementById("panier");
