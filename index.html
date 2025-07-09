@@ -180,31 +180,46 @@
   });
 
   document.getElementById("ticket-preview").innerHTML = `
-<pre style="border:1px dashed #000; padding:15px; background:#fff; font-family:monospace; font-size:13px;">
-------------------------------
-         AK PHONE Solution
-------------------------------
-        14 RUE Gambetta
-      08200, Sedan - FRANCE
-        Tél : 0123456789
-     Siret : 98789929100015
-------------------------------
-Client : ${client}
-Date   : ${date}
-------------------------------
-${lignes}------------------------------
-Sous-total :       ${sousTotal.toFixed(2)} €
-TOTAL TTC  :       ${total.toFixed(2)} €
-Paiement   :       ${paiement}
-------------------------------
-ATTENTION : Garantie 3 mois
-Pas de remboursement. Casse
-et liquide non couverts.
-------------------------------
- Merci pour votre visite ! 🛍️
-</pre>
-  `;
-}
+  <div style="border:1px dashed #000; padding:20px; background:#fff; font-family:monospace; font-size:13px;">
+    <div style="text-align:center; font-weight:bold;">
+      ----------------------------------------<br>
+           AK PHONE Solution<br>
+      ----------------------------------------
+    </div>
+    <div style="text-align:center;">
+      14 RUE Gambetta<br>
+      08200, Sedan - FRANCE<br>
+      Tél : 0123456789<br>
+      Siret : 98789929100015<br>
+    </div>
+    <div style="margin:10px 0;">
+      Client  : ${client}<br>
+      Date    : ${date}
+    </div>
+    <hr>
+    ${produits.map(p => `
+      ${p.nom}<br>
+      Qté: ${p.quantite}    Total: ${(p.prix * p.quantite).toFixed(2)} €
+    `).join('<br>')}
+    <hr>
+    <div>
+      Sous-total : ${sousTotal.toFixed(2)} €<br>
+      TOTAL TTC  : ${total.toFixed(2)} €<br>
+      Paiement   : ${paiement}
+    </div>
+    <hr>
+    <div style="font-size:12px;">
+      ATTENTION : Garantie 1 an pour la réparation <br>
+      
+      
+    </div>
+    <hr>
+    <div style="text-align:center; font-weight:bold;">
+      Merci pour votre visite !
+    </div>
+  </div>
+`;
+
   </script>
 </body>
 </html>
