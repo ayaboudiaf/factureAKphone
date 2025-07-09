@@ -83,9 +83,6 @@
   <label>Nom du produit :</label>
   <input type="text" id="produit" placeholder="ex: IPHONE 13 PRO" />
 
-  <label>IMEI (facultatif) :</label>
-  <input type="text" id="imei" placeholder="ex: 3568601016877523" />
-
   <label>Quantité :</label>
   <input type="number" id="quantite" value="1" />
 
@@ -120,7 +117,6 @@
 
     function ajouterProduit() {
       const nom = document.getElementById('produit').value;
-      const imei = document.getElementById('imei').value;
       const qte = parseInt(document.getElementById('quantite').value);
       const prix = parseFloat(document.getElementById('prix').value);
 
@@ -137,7 +133,6 @@
       majTotaux();
 
       document.getElementById('produit').value = "";
-      document.getElementById('imei').value = "";
       document.getElementById('quantite').value = 1;
       document.getElementById('prix').value = 0;
     }
@@ -148,7 +143,6 @@
       const total = sousTotal;
 
       document.getElementById("sousTotal").textContent = sousTotal.toFixed(2);
-      document.getElementById("tva").textContent = tva.toFixed(2);
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
