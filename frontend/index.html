@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🧾 AK PHONE solution - Facture Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .total {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #274bae;
+      color: white;
+      padding: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #1d3b91;
+    }
+  </style>
+</head>
+<body>
+
+  <h2> Ticket de Vente</h2>
+
+  <label>Nom du client :</label>
+  <input type="text" id="client" placeholder="ex: Mme BOUDIAF-KAMEL" />
+
+  <label>Nom du produit :</label>
+  <input type="text" id="produit" placeholder="ex: IPHONE 13 PRO" />
+
+  <label>IMEI (facultatif) :</label>
+  <input type="text" id="imei" placeholder="ex: 3568601016877523" />
+
+  <label>Quantité :</label>
+  <input type="number" id="quantite" value="1" />
+
+  <label>Prix unitaire €:</label>
+  <input type="number" id="prix" value="0" />
+
+  <button onclick="ajouterProduit()"> Ajouter l’article</button>
+
+  <table>
+    <thead>
+      <tr><th>Produit</th><th>Qté</th><th>Total</th></tr>
+    </thead>
+    <tbody id="panier"></tbody>
+  </table>
+
+  <div class="total">Sous-total : <span id="sousTotal">0</span> €</div>
+  <div class="total">TVA 20% : <span id="tva">0</span> €</div>
+  <div class="total">TOTAL TTC : <span id="total">0</span> €</div>
+
+  <label>Mode de paiement :</label>
+  <select id="paiement">
+    <option value="CB">Carte Bancaire</option>
+    <option value="Espèces">Espèces</option>
+    <option value="Autre">Autre</option>
+  </select>
+
+  <button onclick="envoyer()">🖨️ Imprimer le ticket</button>
+
+  <div id="ticket-preview" style="margin-top: 20px;"></div>
+
+  <script>
+    const produits = [];
+
+    function ajouterProduit() {
+      const nom = document.getElementById('produit').value;
+      const imei = document.getElementById('imei').value;
+      const qte = parseInt(document.getElementById('quantite').value);
+      const prix = parseFloat(document.getElementById('prix').value);
+
+      if (!nom || qte <= 0 || prix <= 0) {
+        alert("Remplir tous les champs correctement");
+        return;
+      }
+
+      produits.push({ nom, quantite: qte, prix, imei });
+      const ligne = `<tr><td>${nom}</td><td>${qte}</td><td>${(prix * qte).toFixed(2)} €</td></tr>`;
+      document.getElementById("panier").innerHTML += ligne;
+
+      majTotaux();
+
+      document.getElementById('produit').value = "";
+      document.getElementById('imei').value = "";
+      document.getElementById('quantite').value = 1;
+      document.getElementById('prix').value = 0;
+    }
+
+    function majTotaux() {
+      const sousTotal = produits.reduce((sum, p) => sum + (p.prix * p.quantite), 0);
+      const tva = sousTotal * 0.2;
+      const total = sousTotal;
+
+      document.getElementById("sousTotal").textContent = sousTotal.toFixed(2);
+      document.getElementById("tva").textContent = tva.toFixed(2);
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
+    function envoyer() {
+      const client = document.getElementById('client').value;
+      const paiement = document.getElementById('paiement').value;
+
+      if (!client || produits.length === 0) {
+        alert("Veuillez saisir le client et au moins un produit");
+        return;
+      }
+
+      fetch("http://localhost:3000/imprimer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nomClient: client, produits, paiement })
+      })
+      .then(res => res.json())
+      .then(data => {
+        afficherTicket(client, produits, paiement);
+        alert("✅ Ticket imprimé !");
+      })
+      .catch(err => {
+        alert("❌ Erreur d'impression");
+        console.error(err);
+      });
+    }
+
+    function afficherTicket(client, produits, paiement) {
+  const date = new Date().toLocaleString();
+  const sousTotal = produits.reduce((sum, p) => sum + (p.prix * p.quantite), 0);
+  const tva = sousTotal * 0.2;
+  const total = sousTotal;
+
+  let lignes = '';
+  produits.forEach(p => {
+    lignes += `<tr>
+      <td>${p.nom}<br><small>IMEI: ${p.imei || '---'}</small></td>
+      <td>${p.quantite}</td>
+      <td>${(p.prix * p.quantite).toFixed(2)} €</td>
+    </tr>`;
+  });
+
+  document.getElementById("ticket-preview").innerHTML = `
+    <div style="border:1px dashed #000; padding:20px; background:#fff; font-family:monospace;">
+      <div style="text-align:center;">
+        <img src="logo.bmp" alt="Logo" width="100" style="margin-bottom:5px;"><br>
+        <strong>AK PHONE Solution</strong><br>
+        ------------------------------<br>
+        14 RUE Gambetta
+        08200 , Sedan - FRANCE  <br>
+        Tél: 0123456789<br>
+        Siret:98789929100015<br>
+        ------------------------------<br>
+        Client: <strong>${client}</strong><br>
+        Date: ${date}
+      </div>
+      <hr>
+      <table style="width:100%; font-size:14px;">
+        <thead>
+          <tr><th>Produit</th><th>Qté</th><th>Total</th></tr>
+        </thead>
+        <tbody>${lignes}</tbody>
+      </table>
+      <hr>
+      <div style="text-align:right;">
+        Sous-total : ${sousTotal.toFixed(2)} €<br>
+        TVA 20% : ${tva.toFixed(2)} €<br>
+        <strong>Total TTC : ${total.toFixed(2)} €</strong><br>
+        Paiement : ${paiement}
+      </div>
+      <hr>
+      <div style="font-size:12px; text-align:center;">
+  ATTENTIOIN! La garantie incluse ne couvre pas la casse,<br>
+  les dommages liquides. Aucun remboursement ne sera possible<br>
+  Nos prestations sont garantis trois mois<br>
+  <div style="font-size:20px; font-weight:bold; margin-top: 10px;">
+    Merci pour votre visite ,à très bientôt! 🛍️
+  </div>
+</div>
+
+    </div>
+  `;
+}
+
+  </script>
+</body>
+</html>
