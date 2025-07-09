@@ -147,30 +147,22 @@
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    function envoyer() {
-      const client = document.getElementById('client').value;
-      const paiement = document.getElementById('paiement').value;
+   function envoyer() {
+  const client = document.getElementById('client').value;
+  const paiement = document.getElementById('paiement').value;
 
-      if (!client || produits.length === 0) {
-        alert("Veuillez saisir le client et au moins un produit");
-        return;
-      }
+  if (!client || produits.length === 0) {
+    alert("Veuillez saisir le client et au moins un produit");
+    return;
+  }
 
-      fetch("http://localhost:3000/imprimer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomClient: client, produits, paiement })
-      })
-      .then(res => res.json())
-      .then(data => {
-        afficherTicket(client, produits, paiement);
-        alert("✅ Ticket imprimé !");
-      })
-      .catch(err => {
-        alert("❌ Erreur d'impression");
-        console.error(err);
-      });
-    }
+  // Affiche le ticket sur la page
+  afficherTicket(client, produits, paiement);
+
+  // Imprime après une petite pause pour laisser le DOM se mettre à jour
+  setTimeout(() => window.print(), 500);
+}
+
 
     function afficherTicket(client, produits, paiement) {
   const date = new Date().toLocaleString();
